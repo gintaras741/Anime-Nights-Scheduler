@@ -13,6 +13,8 @@ interface CosplayerAttributes {
     isGlowingPrejudge?: boolean;
     isCrossedOutCosplay?: boolean;
     isCrossedOutPrejudge?: boolean;
+    cosplayAudio?: string;
+    cosplayVideo?: string;
 }
 
 export class CosplayerInstance extends Model<CosplayerAttributes> {}
@@ -64,6 +66,20 @@ CosplayerInstance.init(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
             allowNull: true,
+        },
+        cosplayAudio: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            validate: {
+                isUrl: true,
+            },
+        },
+        cosplayVideo: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            validate: {
+                isUrl: true,
+            },
         },
     },
     {

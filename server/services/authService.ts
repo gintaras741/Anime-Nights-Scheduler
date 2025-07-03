@@ -3,7 +3,7 @@ import { DataTypes, Model } from "sequelize";
 import { CosplayerInstance } from "./cosplayerService";
 
 interface UserAttributes {
-    id: number;
+    id?: number;
     key: string;
     role: string;
     cosplayer_fk?: string | null;

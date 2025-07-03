@@ -11,7 +11,12 @@ import {
     getCosplayersPrejudgeUser,
     getProfileData,
 } from "./controllers/cosplayerController";
-import { verifyKey } from "./controllers/authController";
+import {
+    createUser,
+    isValidKey,
+    updateUser,
+    verifyKey,
+} from "./controllers/authController";
 import {
     authenticateKey,
     authorizeAdmin,
@@ -45,6 +50,8 @@ router.get(
     authorizeUser,
     getCosplayersUser
 );
+router.post("/users", authenticateKey, authorizeAdmin, createUser);
+router.put("/users/:stagename", authenticateKey, authorizeAdmin, updateUser);
 router.get(
     "/cosplayers/prejudge/user",
     authenticateKey,
@@ -72,5 +79,6 @@ router.delete(
 );
 router.get("/profile", authenticateKey, getProfileData);
 router.post("/verifyKey", verifyKey);
+router.post("/isvalidkey", authenticateKey, authorizeAdmin, isValidKey);
 
 export default router;

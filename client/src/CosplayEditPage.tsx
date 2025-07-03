@@ -21,6 +21,9 @@ const cosplayerSchema = z.object({
     comment: z.string().optional(),
     prejudge: z.boolean(),
     prejudgeTime: z.string().optional(),
+    cosplayAudio: z.string().optional(),
+    cosplayVideo: z.string().optional(),
+    key: z.string().min(1, "Key is required"),
 });
 
 export type Cosplayer = z.infer<typeof cosplayerSchema>;
@@ -113,9 +116,9 @@ export default function CosplayEditPage() {
 
     //DELETE
     const deleteCosplayerMutation = useMutation({
-        mutationFn: async (staename: string) => {
+        mutationFn: async (stagename: string) => {
             const response = await fetch(
-                `http://localhost:3000/api/cosplayers/${staename}`,
+                `http://localhost:3000/api/cosplayers/${stagename}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -134,6 +137,69 @@ export default function CosplayEditPage() {
         },
         onError: (error: any) => {
             toast.error(`Error deleting cosplayer: ${error.message}`);
+        },
+    });
+
+    //POST USER
+    const createUserMutation = useMutation({
+        mutationFn: async ({
+            stagename,
+            key,
+        }: {
+            stagename: string;
+            key: string;
+        }) => {
+            const response = await fetch("http://localhost:3000/api/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    key: localStorage.getItem("key") || "",
+                },
+                body: JSON.stringify({ stagename, key }),
+            });
+            if (!response.ok) {
+                throw new Error("Failed to create user");
+            }
+            return response.json();
+        },
+        onSuccess: () => {
+            toast.success("User created successfully!");
+        },
+        onError: (error: any) => {
+            toast.error(`Error creating user: ${error.message}`);
+        },
+    });
+
+    //PUT USER
+    const updateUserMutation = useMutation({
+        mutationFn: async ({
+            stagename,
+            key,
+        }: {
+            stagename: string;
+            key: string;
+        }) => {
+            const response = await fetch(
+                `http://localhost:3000/api/users/${stagename}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        key: localStorage.getItem("key") || "",
+                    },
+                    body: JSON.stringify({ key }),
+                }
+            );
+            if (!response.ok) {
+                throw new Error("Failed to update user");
+            }
+            return response.json();
+        },
+        onSuccess: () => {
+            toast.success("User updated successfully!");
+        },
+        onError: (error: any) => {
+            toast.error(`Error updating user: ${error.message}`);
         },
     });
 
@@ -166,8 +232,16 @@ export default function CosplayEditPage() {
                 originalStagename: originalStagename,
                 updatedCosplayer: data,
             });
+            updateUserMutation.mutate({
+                stagename: originalStagename,
+                key: data.key,
+            });
         } else {
             addCosplayerMutation.mutate(data);
+            createUserMutation.mutate({
+                stagename: data.stagename,
+                key: data.key,
+            });
         }
     };
 

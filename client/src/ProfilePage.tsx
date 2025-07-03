@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Clock, MessageSquare, User } from "lucide-react";
+import { Calendar, Clock, MessageSquare, Upload, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Badge } from "./components/ui/badge";
 
@@ -13,7 +13,6 @@ export default function ProfilePage() {
             }).then((res) => res.json()),
         queryKey: ["profile"],
     });
-    console.log(data);
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -121,20 +120,46 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gray-900 border-gray-800 border-yellow-600">
+                    <Card className="bg-gray-900 border-gray-800">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3 text-white">
+                                <Upload className="h-5 w-5 text-red-500" />
+                                Contest Files
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <iframe
+                                src={data.cosplayer.cosplayAudio}
+                                width="640"
+                                height="120"
+                                allow="autoplay"
+                            ></iframe>
+                            {data.cosplayer.cosplayVideo && (
+                                <iframe
+                                    src={data.cosplayer.cosplayVideo}
+                                    width="640"
+                                    height="480"
+                                    allow="autoplay"
+                                ></iframe>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-gray-900 border-yellow-600">
                         <CardContent className="p-6">
                             <div className="text-center">
                                 <h4 className="text-lg font-medium text-yellow-500 mb-3">
                                     Important Notice
                                 </h4>
-                                <p className="text-sm text-gray-300 leading-relaxed">
-                                    Please arrive at least 15 minutes before
-                                    your scheduled time. Times are subject to
-                                    change - check this page regularly for
-                                    updates. If you need to make changes to your
-                                    registration, contact the event organizers
-                                    immediately. Late arrivals may result in
-                                    disqualification.
+                                <p className="text-m text-gray-300 leading-relaxed">
+                                    If any displayed information is incorrect,
+                                    pleace contact us at{" "}
+                                    <a
+                                        href="mailto:animenights@infosa.lt"
+                                        className="text-red-500 underline hover:text-red-400"
+                                    >
+                                        animenights@infosa.lt
+                                    </a>
                                 </p>
                             </div>
                         </CardContent>

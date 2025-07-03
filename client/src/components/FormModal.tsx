@@ -22,6 +22,7 @@ import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { useMutation } from "@tanstack/react-query";
 
 const cosplayerSchema = z.object({
     stagename: z.string().min(1, "Stagename is required"),
@@ -30,6 +31,9 @@ const cosplayerSchema = z.object({
     comment: z.string().optional(),
     prejudge: z.boolean(),
     prejudgeTime: z.string().optional(),
+    cosplayAudio: z.string().optional(),
+    cosplayVideo: z.string().optional(),
+    key: z.string().min(1, "Key is required"),
 });
 export type Cosplayer = z.infer<typeof cosplayerSchema>;
 
@@ -65,8 +69,43 @@ export default function FormModal({
             comment: "",
             prejudge: false,
             prejudgeTime: "",
+            cosplayAudio: "",
+            cosplayVideo: "",
+            key: "",
         },
     });
+
+    const checkKeyMutation = useMutation({
+        mutationFn: async (key: string) => {
+            const response = await fetch(
+                "http://localhost:3000/api/isvalidkey",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        key: localStorage.getItem("key") || "",
+                    },
+                    body: JSON.stringify({ key }),
+                }
+            );
+            if (!response.ok) {
+                return false;
+            }
+            return true;
+        },
+        onSuccess: (validKey, generatedKey) => {
+            if (!validKey) {
+                handleGenerateKey();
+            } else {
+                form.setValue("key", generatedKey);
+            }
+        },
+    });
+
+    const handleGenerateKey = () => {
+        const generatedKey = Math.random().toString(36).substring(2, 15);
+        checkKeyMutation.mutate(generatedKey);
+    };
 
     useEffect(() => {
         if (cosplayerToEdit) {
@@ -77,6 +116,8 @@ export default function FormModal({
                     ? formatTime(cosplayerToEdit.prejudgeTime)
                     : "",
                 comment: cosplayerToEdit.comment || undefined,
+                cosplayAudio: cosplayerToEdit.cosplayAudio || undefined,
+                cosplayVideo: cosplayerToEdit.cosplayVideo || undefined,
             });
         } else {
             form.reset({
@@ -86,6 +127,9 @@ export default function FormModal({
                 comment: undefined,
                 prejudge: false,
                 prejudgeTime: "",
+                cosplayAudio: undefined,
+                cosplayVideo: undefined,
+                key: "",
             });
         }
     }, [cosplayerToEdit, isOpen, form.reset]);
@@ -216,6 +260,64 @@ export default function FormModal({
                                     <FormControl>
                                         <Textarea {...field} />
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="cosplayVideo"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Cosplay video</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="url"
+                                            placeholder="https://drive.google.com/file/d/id/preview"
+                                            {...field}
+                                        ></Input>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="cosplayAudio"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Cosplay audio</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="url"
+                                            placeholder="https://drive.google.com/file/d/id/preview"
+                                            {...field}
+                                        ></Input>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="key"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Key</FormLabel>
+                                    <div className="flex">
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <Button
+                                            className="ml-5"
+                                            type="button"
+                                            onClick={handleGenerateKey}
+                                        >
+                                            Generate
+                                        </Button>
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )}

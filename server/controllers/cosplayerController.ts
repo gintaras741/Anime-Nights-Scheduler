@@ -297,6 +297,8 @@ export const getProfileData = async (req: Request, res: Response) => {
                         "prejudge",
                         "prejudgeTime",
                         "comment",
+                        "cosplayAudio",
+                        "cosplayVideo",
                     ],
                 },
             ],

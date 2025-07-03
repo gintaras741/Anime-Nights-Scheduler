@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import router from "./routes";
 import db from "./database";
 import http from "http";
-import path from "path";
 import helmet from "helmet";
 import { Server } from "socket.io";
 import {
@@ -13,7 +12,6 @@ import {
     togglePrejudgeCrossedOut,
     togglePrejudgeGlow,
 } from "./controllers/cosplayerController";
-import { authenticateKey } from "./middleware/auth";
 
 const corsOptions = {
     origin: ["http://localhost:3000", "http://localhost:5173"],
