@@ -5,7 +5,7 @@ import { NavLink } from "react-router";
 import { toast } from "sonner";
 
 export default function Header() {
-    const { role, isAuthenticated, logout } = useAuth();
+    const { role, isAuthenticated, logout, userName } = useAuth();
 
     const handleLogout = () => {
         logout();
@@ -20,7 +20,7 @@ export default function Header() {
             <div className="flex-1 flex justify-end">
                 {isAuthenticated ? (
                     <div className="flex flex-col justify-center items-center">
-                        <h1>Authenticated as {role}</h1>
+                        <h1>Logged in as {userName ? userName : role}</h1>
                         <Button
                             onClick={handleLogout}
                             className="bg-gray-700 text-white cursor-pointer mt-2"

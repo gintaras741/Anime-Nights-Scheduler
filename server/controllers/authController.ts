@@ -12,7 +12,7 @@ export const verifyKey = async (req: Request, res: Response) => {
     try {
         const user = await UserInstance.findOne({
             where: { key },
-            attributes: ["id", "role"],
+            attributes: ["id", "role", "cosplayer_fk"],
         });
 
         if (!user) {

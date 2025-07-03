@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [role, setRole] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [userName, setUserName] = useState<string | null>(null);
 
     const login = async (key: string) => {
         try {
@@ -25,12 +26,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setKey(key);
                 setRole(data.role);
                 setIsAuthenticated(true);
+                setUserName(data.cosplayer_fk || null);
                 return { success: true, role: data.role };
             } else {
                 localStorage.removeItem("key");
                 setKey(null);
                 setRole(null);
                 setIsAuthenticated(false);
+                setUserName(null);
                 return { success: false, message: "Invalid key" };
             }
         } catch (error) {
@@ -62,7 +65,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AuthContext.Provider
-            value={{ key, role, isAuthenticated, isLoading, login, logout }}
+            value={{
+                key,
+                role,
+                isAuthenticated,
+                isLoading,
+                login,
+                logout,
+                userName,
+            }}
         >
             {children}
         </AuthContext.Provider>
