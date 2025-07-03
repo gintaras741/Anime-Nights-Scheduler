@@ -1,3 +1,4 @@
+import AccessDeniedPage from "@/AccessDeniedPage";
 import { useAuth } from "@/AuthContext";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router";
@@ -20,7 +21,7 @@ export default function ProtectedRoute({
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
-        return <h1>Access Denied</h1>;
+        return <AccessDeniedPage />;
     }
     return children;
 }
