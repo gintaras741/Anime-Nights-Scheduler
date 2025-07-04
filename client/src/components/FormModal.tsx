@@ -135,7 +135,7 @@ export default function FormModal({
     }, [cosplayerToEdit, isOpen, form.reset]);
 
     const handleSubmit = (data: Cosplayer) => {
-        const DUMMY_DATE = "2001-09-11T";
+        const DUMMY_DATE = "2004-10-23T";
 
         const submittedData = {
             ...data,
