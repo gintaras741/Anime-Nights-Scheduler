@@ -8,7 +8,7 @@ module.exports = {
             env: {
                 NODE_ENV: "production",
                 PORT: 4000,
-                CORS_ORIGINS: "https://an.gintaras.me,http://an.gintaras.me,http://localhost:5173,http://localhost:3000",
+                CORS_ORIGINS: "https://an.gintaras.me,http://an.gintaras.me,http://localhost:5173,http://localhost:4000",
             },
         },
     ],

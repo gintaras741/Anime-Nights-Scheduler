@@ -55,7 +55,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api", router);
 
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 4000;
 const dbPath = process.env.DB_PATH || path.resolve(__dirname, "..", "database.db");
 
 const startServer = async () => {
