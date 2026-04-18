@@ -10,16 +10,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const login = async (key: string) => {
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/verifykey",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        key: key,
-                    },
-                }
-            );
+            const response = await fetch("/api/verifykey", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    key: key,
+                },
+            });
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem("key", key);

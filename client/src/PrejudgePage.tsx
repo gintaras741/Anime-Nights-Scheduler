@@ -19,7 +19,7 @@ export default function PrejudgePage() {
 
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/cosplayers/prejudge", {
+            await fetch("/api/cosplayers/prejudge", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },
@@ -28,7 +28,7 @@ export default function PrejudgePage() {
     });
 
     useEffect(() => {
-        const socket = io("http://localhost:3000");
+        const socket = io();
 
         socket.on("connect", () => {
             console.log("Connected to the server");

@@ -11,7 +11,7 @@ import {
 export default function UserCosplayPage() {
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/cosplayers/user", {
+            await fetch("/api/cosplayers/user", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },

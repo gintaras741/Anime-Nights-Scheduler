@@ -18,7 +18,7 @@ export default function CosplayPage() {
     const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/cosplayers", {
+            await fetch("/api/cosplayers", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },
@@ -27,7 +27,7 @@ export default function CosplayPage() {
     });
 
     useEffect(() => {
-        const socket = io("http://localhost:3000");
+        const socket = io();
 
         socket.on("connect", () => {
             console.log("Connected to the server");

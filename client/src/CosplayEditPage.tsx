@@ -41,7 +41,7 @@ export default function CosplayEditPage() {
     const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/cosplayers/all", {
+            await fetch("/api/cosplayers/all", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },
@@ -52,17 +52,14 @@ export default function CosplayEditPage() {
     //POST
     const addCosplayerMutation = useMutation({
         mutationFn: async (newCosplayer: Cosplayer) => {
-            const response = await fetch(
-                "http://localhost:3000/api/cosplayers",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        key: localStorage.getItem("key") || "",
-                    },
-                    body: JSON.stringify(newCosplayer),
-                }
-            );
+            const response = await fetch("/api/cosplayers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    key: localStorage.getItem("key") || "",
+                },
+                body: JSON.stringify(newCosplayer),
+            });
             if (!response.ok) {
                 throw new Error("Failed to add cosplayer");
             }
@@ -90,7 +87,7 @@ export default function CosplayEditPage() {
                 throw new Error("Original stagename is required for update");
             }
             const response = await fetch(
-                `http://localhost:3000/api/cosplayers/${originalStagename}`,
+                `/api/cosplayers/${originalStagename}`,
                 {
                     method: "PUT",
                     headers: {
@@ -117,15 +114,12 @@ export default function CosplayEditPage() {
     //DELETE
     const deleteCosplayerMutation = useMutation({
         mutationFn: async (stagename: string) => {
-            const response = await fetch(
-                `http://localhost:3000/api/cosplayers/${stagename}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        key: localStorage.getItem("key") || "",
-                    },
-                }
-            );
+            const response = await fetch(`/api/cosplayers/${stagename}`, {
+                method: "DELETE",
+                headers: {
+                    key: localStorage.getItem("key") || "",
+                },
+            });
             if (!response.ok) {
                 throw new Error("Failed to delete cosplayer");
             }
@@ -149,7 +143,7 @@ export default function CosplayEditPage() {
             stagename: string;
             key: string;
         }) => {
-            const response = await fetch("http://localhost:3000/api/users", {
+            const response = await fetch("/api/users", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -179,17 +173,14 @@ export default function CosplayEditPage() {
             stagename: string;
             key: string;
         }) => {
-            const response = await fetch(
-                `http://localhost:3000/api/users/${stagename}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        key: localStorage.getItem("key") || "",
-                    },
-                    body: JSON.stringify({ key }),
-                }
-            );
+            const response = await fetch(`/api/users/${stagename}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    key: localStorage.getItem("key") || "",
+                },
+                body: JSON.stringify({ key }),
+            });
             if (!response.ok) {
                 throw new Error("Failed to update user");
             }

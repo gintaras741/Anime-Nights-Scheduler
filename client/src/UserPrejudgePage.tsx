@@ -11,7 +11,7 @@ import {
 export default function UserPrejudgePage() {
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/cosplayers/prejudge/user", {
+            await fetch("/api/cosplayers/prejudge/user", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },

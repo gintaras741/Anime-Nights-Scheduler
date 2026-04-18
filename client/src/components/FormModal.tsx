@@ -77,17 +77,14 @@ export default function FormModal({
 
     const checkKeyMutation = useMutation({
         mutationFn: async (key: string) => {
-            const response = await fetch(
-                "http://localhost:3000/api/isvalidkey",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        key: localStorage.getItem("key") || "",
-                    },
-                    body: JSON.stringify({ key }),
-                }
-            );
+            const response = await fetch("/api/isvalidkey", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    key: localStorage.getItem("key") || "",
+                },
+                body: JSON.stringify({ key }),
+            });
             if (!response.ok) {
                 return false;
             }

@@ -13,11 +13,19 @@ import {
     togglePrejudgeGlow,
 } from "./controllers/cosplayerController";
 
-const corsOptions = {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
-};
-
 dotenv.config();
+
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const corsOptions = {
+    origin:
+        allowedOrigins.length > 0
+            ? allowedOrigins
+            : ["http://localhost:3000", "http://localhost:5173"],
+};
 
 db.sync();
 
@@ -28,7 +36,7 @@ app.use(helmet());
 const httpserver = http.createServer(app);
 const socket = new Server(httpserver, {
     cors: {
-        origin: ["http://localhost:3000", "http://localhost:5173"],
+        origin: corsOptions.origin,
         methods: ["GET", "POST"],
     },
 });
@@ -48,8 +56,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api", router);
 
-httpserver.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
+const port = Number(process.env.PORT) || 3000;
+
+httpserver.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
 
 export { socket };

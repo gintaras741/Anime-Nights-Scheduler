@@ -6,7 +6,7 @@ import { Badge } from "./components/ui/badge";
 export default function ProfilePage() {
     const { data, isLoading } = useQuery({
         queryFn: async () =>
-            await fetch("http://localhost:3000/api/profile", {
+            await fetch("/api/profile", {
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },
