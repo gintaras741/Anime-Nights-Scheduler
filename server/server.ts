@@ -6,6 +6,7 @@ import db from "./database";
 import http from "http";
 import helmet from "helmet";
 import { Server } from "socket.io";
+import path from "path";
 import {
     toggleCosplayCrossedOut,
     toggleCosplayGlow,
@@ -26,8 +27,6 @@ const corsOptions = {
             ? allowedOrigins
             : ["http://localhost:3000", "http://localhost:5173"],
 };
-
-db.sync();
 
 const app = express();
 
@@ -57,9 +56,22 @@ app.use(express.json());
 app.use("/api", router);
 
 const port = Number(process.env.PORT) || 3000;
+const dbPath = process.env.DB_PATH || path.resolve(__dirname, "..", "database.db");
 
-httpserver.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+const startServer = async () => {
+    try {
+        await db.sync();
+        console.log(`Database ready at ${dbPath}`);
+
+        httpserver.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+        });
+    } catch (error) {
+        console.error("Failed to initialize database:", error);
+        process.exit(1);
+    }
+};
+
+startServer();
 
 export { socket };
