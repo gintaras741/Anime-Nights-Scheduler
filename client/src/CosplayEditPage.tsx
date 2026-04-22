@@ -118,12 +118,13 @@ export default function CosplayEditPage() {
     //DELETE
     const deleteCosplayerMutation = useMutation({
         mutationFn: async (stagename: string) => {
-            const encodedStagename = encodeURIComponent(stagename);
-            const response = await fetch(`/api/cosplayers/${encodedStagename}`, {
+            const response = await fetch(`/api/cosplayers`, {
                 method: "DELETE",
                 headers: {
+                    "Content-Type": "application/json",
                     key: localStorage.getItem("key") || "",
                 },
+                body: JSON.stringify({ stagename }),
             });
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
@@ -221,7 +222,7 @@ export default function CosplayEditPage() {
         }
     };
 
-    const handleSave = (data: Cosplayer) => {
+    const handleSave = async (data: Cosplayer) => {
         if (cosplayerToEdit) {
             if (!originalStagename) {
                 toast.error(
@@ -229,14 +230,26 @@ export default function CosplayEditPage() {
                 );
                 return;
             }
-            updateCosplayerMutation.mutate({
-                originalStagename: originalStagename,
-                updatedCosplayer: data,
-            });
-            updateUserMutation.mutate({
-                stagename: originalStagename,
-                key: data.key,
-            });
+            try {
+                await updateCosplayerMutation.mutateAsync({
+                    originalStagename: originalStagename,
+                    updatedCosplayer: data,
+                });
+
+                try {
+                    await updateUserMutation.mutateAsync({
+                        stagename: data.stagename,
+                        key: data.key,
+                    });
+                } catch {
+                    await createUserMutation.mutateAsync({
+                        stagename: data.stagename,
+                        key: data.key,
+                    });
+                }
+            } catch {
+                // Error toasts are handled by mutation onError callbacks.
+            }
         } else {
             addCosplayerMutation.mutate(data);
             createUserMutation.mutate({

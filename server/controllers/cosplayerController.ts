@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { socket } from "../server";
 import { CosplayerInstance } from "../services/index";
 import { UserInstance } from "../services/index";
+import { col, fn, where } from "sequelize";
 
 export const createCosplayer = async (req: Request, res: Response) => {
     console.log("Cosplayer:", { ...req.body });
@@ -155,17 +156,28 @@ export const getCosplayerByName = async (req: Request, res: Response) => {
 
 export const updateCosplayer = async (req: Request, res: Response) => {
     try {
-        const { stagename } = req.params;
+        const stagename = (req.params.stagename || "").trim();
+        if (!stagename) {
+            res.status(400).json({ message: "Stagename is required" });
+            return;
+        }
+
         const cosplayer = await CosplayerInstance.findOne({
             where: { stagename },
         });
 
-        if (!cosplayer) {
+        const resolvedCosplayer =
+            cosplayer ||
+            (await CosplayerInstance.findOne({
+                where: where(fn("LOWER", col("stagename")), stagename.toLowerCase()),
+            }));
+
+        if (!resolvedCosplayer) {
             res.status(404).json({ message: "Cosplayer not found" });
             return;
         }
 
-        const updatedCosplayer = await cosplayer.update(req.body);
+        const updatedCosplayer = await resolvedCosplayer.update(req.body);
         socket.emit("cosplayersUpdated");
         res.status(200).json({ updatedCosplayer });
     } catch (error: any) {
@@ -179,15 +191,28 @@ export const updateCosplayer = async (req: Request, res: Response) => {
 
 export const deleteCosplayer = async (req: Request, res: Response) => {
     try {
-        const { stagename } = req.params;
+        const stagename = (req.params.stagename || req.body?.stagename || "").trim();
+        if (!stagename) {
+            res.status(400).json({ message: "Stagename is required" });
+            return;
+        }
+
         const cosplayer = await CosplayerInstance.findOne({
             where: { stagename },
         });
-        if (!cosplayer) {
+
+        const resolvedCosplayer =
+            cosplayer ||
+            (await CosplayerInstance.findOne({
+                where: where(fn("LOWER", col("stagename")), stagename.toLowerCase()),
+            }));
+
+        if (!resolvedCosplayer) {
             res.status(404).json({ message: "Cosplayer not found" });
             return;
         }
-        await cosplayer.destroy();
+
+        await resolvedCosplayer.destroy();
         socket.emit("cosplayersUpdated");
         res.status(200).json({ message: "Cosplayer deleted successfully" });
     } catch (error: any) {

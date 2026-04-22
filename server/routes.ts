@@ -72,6 +72,12 @@ router.put(
     updateCosplayer
 );
 router.delete(
+    "/cosplayers",
+    authenticateKey,
+    authorizeAdmin,
+    deleteCosplayer
+);
+router.delete(
     "/cosplayers/:stagename",
     authenticateKey,
     authorizeAdmin,
