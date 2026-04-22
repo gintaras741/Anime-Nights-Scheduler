@@ -86,8 +86,9 @@ export default function CosplayEditPage() {
             if (!originalStagename) {
                 throw new Error("Original stagename is required for update");
             }
+            const encodedStagename = encodeURIComponent(originalStagename);
             const response = await fetch(
-                `/api/cosplayers/${originalStagename}`,
+                `/api/cosplayers/${encodedStagename}`,
                 {
                     method: "PUT",
                     headers: {
@@ -98,7 +99,10 @@ export default function CosplayEditPage() {
                 }
             );
             if (!response.ok) {
-                throw new Error("Failed to update cosplayer");
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || "Failed to update cosplayer"
+                );
             }
             return response.json();
         },
@@ -114,14 +118,18 @@ export default function CosplayEditPage() {
     //DELETE
     const deleteCosplayerMutation = useMutation({
         mutationFn: async (stagename: string) => {
-            const response = await fetch(`/api/cosplayers/${stagename}`, {
+            const encodedStagename = encodeURIComponent(stagename);
+            const response = await fetch(`/api/cosplayers/${encodedStagename}`, {
                 method: "DELETE",
                 headers: {
                     key: localStorage.getItem("key") || "",
                 },
             });
             if (!response.ok) {
-                throw new Error("Failed to delete cosplayer");
+                const errorData = await response.json().catch(() => null);
+                throw new Error(
+                    errorData?.message || "Failed to delete cosplayer"
+                );
             }
             return response.json();
         },
@@ -173,7 +181,8 @@ export default function CosplayEditPage() {
             stagename: string;
             key: string;
         }) => {
-            const response = await fetch(`/api/users/${stagename}`, {
+            const encodedStagename = encodeURIComponent(stagename);
+            const response = await fetch(`/api/users/${encodedStagename}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -182,7 +191,8 @@ export default function CosplayEditPage() {
                 body: JSON.stringify({ key }),
             });
             if (!response.ok) {
-                throw new Error("Failed to update user");
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || "Failed to update user");
             }
             return response.json();
         },
