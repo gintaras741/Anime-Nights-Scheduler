@@ -218,7 +218,11 @@ export default function CosplayEditPage() {
 
     const handleDeleteClick = async (stagename: string) => {
         if (window.confirm("Are you sure you want to delete this cosplayer?")) {
-            await deleteCosplayerMutation.mutateAsync(stagename);
+            try {
+                await deleteCosplayerMutation.mutateAsync(stagename);
+            } catch {
+                // Error toast is handled by mutation onError callback.
+            }
         }
     };
 

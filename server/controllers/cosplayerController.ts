@@ -4,6 +4,52 @@ import { CosplayerInstance } from "../services/index";
 import { UserInstance } from "../services/index";
 import { col, fn, where } from "sequelize";
 
+const normalizeStagename = (value: string) =>
+    value
+        .normalize("NFKC")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+
+const findCosplayerByStagename = async (rawStagename: string) => {
+    const stagename = (rawStagename || "").trim();
+    if (!stagename) {
+        return null;
+    }
+
+    const direct = await CosplayerInstance.findOne({
+        where: { stagename },
+    });
+    if (direct) {
+        return direct;
+    }
+
+    const caseInsensitive = await CosplayerInstance.findOne({
+        where: where(fn("LOWER", col("stagename")), stagename.toLowerCase()),
+    });
+    if (caseInsensitive) {
+        return caseInsensitive;
+    }
+
+    const normalizedTarget = normalizeStagename(stagename);
+    const candidates = await CosplayerInstance.findAll({
+        attributes: ["stagename"],
+    });
+
+    const matched = candidates.find((candidate) => {
+        const candidateStagename = candidate.get("stagename") as string;
+        return normalizeStagename(candidateStagename) === normalizedTarget;
+    });
+
+    if (!matched) {
+        return null;
+    }
+
+    return CosplayerInstance.findOne({
+        where: { stagename: matched.get("stagename") as string },
+    });
+};
+
 export const createCosplayer = async (req: Request, res: Response) => {
     console.log("Cosplayer:", { ...req.body });
     try {
@@ -162,15 +208,7 @@ export const updateCosplayer = async (req: Request, res: Response) => {
             return;
         }
 
-        const cosplayer = await CosplayerInstance.findOne({
-            where: { stagename },
-        });
-
-        const resolvedCosplayer =
-            cosplayer ||
-            (await CosplayerInstance.findOne({
-                where: where(fn("LOWER", col("stagename")), stagename.toLowerCase()),
-            }));
+        const resolvedCosplayer = await findCosplayerByStagename(stagename);
 
         if (!resolvedCosplayer) {
             res.status(404).json({ message: "Cosplayer not found" });
@@ -197,15 +235,7 @@ export const deleteCosplayer = async (req: Request, res: Response) => {
             return;
         }
 
-        const cosplayer = await CosplayerInstance.findOne({
-            where: { stagename },
-        });
-
-        const resolvedCosplayer =
-            cosplayer ||
-            (await CosplayerInstance.findOne({
-                where: where(fn("LOWER", col("stagename")), stagename.toLowerCase()),
-            }));
+        const resolvedCosplayer = await findCosplayerByStagename(stagename);
 
         if (!resolvedCosplayer) {
             res.status(404).json({ message: "Cosplayer not found" });
