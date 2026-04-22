@@ -120,7 +120,12 @@ export const getAllCosplayers = async (req: Request, res: Response) => {
 export const getCosplayersUser = async (req: Request, res: Response) => {
     try {
         const cosplayers = await CosplayerInstance.findAll({
-            attributes: ["stagename", "cosplayTime"],
+            attributes: [
+                "stagename",
+                "cosplayTime",
+                "isGlowingCosplay",
+                "isCrossedOutCosplay",
+            ],
             order: [["cosplayTime", "ASC"]],
         });
         res.status(200).json({ cosplayers });
@@ -164,7 +169,12 @@ export const getCosplayersPrejudgeUser = async (
 ) => {
     try {
         const cosplayers = await CosplayerInstance.findAll({
-            attributes: ["stagename", "prejudgeTime"],
+            attributes: [
+                "stagename",
+                "prejudgeTime",
+                "isGlowingPrejudge",
+                "isCrossedOutPrejudge",
+            ],
             where: {
                 prejudge: true,
             },

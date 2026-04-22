@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     Table,
     TableBody,
@@ -7,8 +7,12 @@ import {
     TableHeader,
     TableRow,
 } from "./components/ui/table";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 
 export default function UserPrejudgePage() {
+    const queryClient = useQueryClient();
+
     const { data, isLoading } = useQuery({
         queryFn: async () =>
             await fetch("/api/cosplayers/prejudge/user", {
@@ -18,6 +22,21 @@ export default function UserPrejudgePage() {
             }).then((res) => res.json()),
         queryKey: ["prejudgeUser"],
     });
+
+        useEffect(() => {
+            const socket = io();
+
+            socket.on("cosplayersUpdated", () => {
+                queryClient.invalidateQueries({
+                    queryKey: ["prejudgeUser"],
+                });
+            });
+
+            return () => {
+                socket.disconnect();
+            };
+        }, [queryClient]);
+
     return (
         <div className="flex flex-col items-left mx-auto">
             <div className="flex justify-center">
@@ -41,8 +60,19 @@ export default function UserPrejudgePage() {
                         ) : (
                             data.cosplayers.map(
                                 (cosplayer: any, index: number) => {
+                                    const isCrossedOut =
+                                        cosplayer.isCrossedOutPrejudge;
                                     return (
-                                        <TableRow key={cosplayer.stagename}>
+                                        <TableRow
+                                            key={cosplayer.stagename}
+                                            className={
+                                                isCrossedOut
+                                                    ? "line-through text-gray-500"
+                                                    : cosplayer.isGlowingPrejudge
+                                                    ? "animate-pulse-glow-green"
+                                                    : ""
+                                            }
+                                        >
                                             <TableCell className="text-center">
                                                 {index + 1}
                                             </TableCell>
